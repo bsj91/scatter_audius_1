@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Audius Scatterplot with Smart Centered Labels</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f9f9f9;
+            margin: 40px;
+        }
+        .tooltip {
+            position: absolute;
+            background: white;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            pointer-events: none;
+            font-size: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .controls {
+            margin-top: 20px;
+        }
+        label {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+<h2>Audius Artist Support Scatterplot</h2>
+<svg width="960" height="600"></svg>
+<div class="tooltip" style="opacity:0;"></div>
+
+<div class="controls">
+    <label>Max Unique Supporters: <input id="xSlider" type="range" min="10" max="120" value="120"/></label>
+    <label>Max $AUDIO: <input id="ySlider" type="range" min="100" max="4000" value="4000"/></label>
+</div>
+
+<script>
+    const data = [{"Artist Name":"Skrillex","Profile Image":"https:\/\/creatornode.audius.prod-eks-ap-northeast-1.staked.cloud\/content\/QmSAsYQXuvjjN8JRdA64NLxgJvtDBRrh6phywrW8BtjyUe\/1000x1000.jpg","Followers":389085,"Total Audio Spent":3108,"Unique Supporters":100},{"Artist Name":"Bonfire \u0628\u0627\u0628\u0627 ","Profile Image":"https:\/\/audius-content-13.figment.io\/content\/01JHKX1NXG011WYND6MG5JXTWG\/1000x1000.jpg","Followers":11714,"Total Audio Spent":2246,"Unique Supporters":90},{"Artist Name":"Druggy","Profile Image":"https:\/\/audius-content-12.cultur3stake.com\/content\/QmY3DkTCdcpMorPzrCxPv4wuga6ovmi2E4iAZUrdDLhWQV\/1000x1000.jpg","Followers":1259,"Total Audio Spent":1706,"Unique Supporters":23},{"Artist Name":"camoufly","Profile Image":"https:\/\/audius-creator-2.theblueprint.xyz\/content\/01HJ6KQWT0Z3VVRM5G8J1SCY94\/1000x1000.jpg","Followers":17888,"Total Audio Spent":1514,"Unique Supporters":53},{"Artist Name":"GALLUS","Profile Image":"https:\/\/audius-content-16.cultur3stake.com\/content\/01JNB47GFYE1K9T7QGAYD21B0N\/1000x1000.jpg","Followers":78,"Total Audio Spent":1124,"Unique Supporters":4},{"Artist Name":"shant singh","Profile Image":"https:\/\/audius-content-9.cultur3stake.com\/content\/01HT5KH0G9F4YWDW3PK4SC78YK\/1000x1000.jpg","Followers":46,"Total Audio Spent":1062,"Unique Supporters":2},{"Artist Name":"Phuture Collective","Profile Image":"https:\/\/audius-content-9.cultur3stake.com\/content\/01J4T9A52VSBGZYPQQEP5B5RYF\/1000x1000.jpg","Followers":27943,"Total Audio Spent":869,"Unique Supporters":56},{"Artist Name":"deadmau5","Profile Image":"https:\/\/audius-creator-11.theblueprint.xyz\/content\/QmWMKwECYqpJ9zXajwpEtmdGc4cntX9ktJMtUHGJfQNvs2\/1000x1000.jpg","Followers":84188,"Total Audio Spent":859,"Unique Supporters":67},{"Artist Name":"M?STIC ","Profile Image":"https:\/\/blockchange-audius-content-01.bdnodes.net\/content\/01HSAPVAY2SC4M7S8Z0M9CJS9T\/1000x1000.jpg","Followers":1785,"Total Audio Spent":820,"Unique Supporters":8},{"Artist Name":"Dreamulator","Profile Image":"https:\/\/audius-content-3.cultur3stake.com\/content\/01JHSJTGXVMND8SCX81B1F6M5K\/1000x1000.jpg","Followers":127,"Total Audio Spent":740,"Unique Supporters":6},{"Artist Name":"Disclosure","Profile Image":"https:\/\/blockdaemon-audius-content-01.bdnodes.net\/content\/01J2W8WSW2QZB5CAEDD8ZC5YM0\/1000x1000.jpg","Followers":220627,"Total Audio Spent":638,"Unique Supporters":54},{"Artist Name":"bitbird","Profile Image":"https:\/\/audius-content-7.figment.io\/content\/01JEE7JE7GWQ7C8354XYJ27N30\/1000x1000.jpg","Followers":61280,"Total Audio Spent":564,"Unique Supporters":48},{"Artist Name":"snooze\ud83d\udca4","Profile Image":"https:\/\/audius-creator-2.theblueprint.xyz\/content\/01JCRFE2WEW4Q9MAF5CAHACGK9\/1000x1000.jpg","Followers":10591,"Total Audio Spent":554,"Unique Supporters":28},{"Artist Name":"RAC","Profile Image":"https:\/\/audius-content-6.cultur3stake.com\/content\/QmeZmZsxNbZ6prX9yg6sa2pk4bPPRUfdYJPqqndRanUrsf\/1000x1000.jpg","Followers":66452,"Total Audio Spent":511,"Unique Supporters":32},{"Artist Name":"mija","Profile Image":"https:\/\/cn1.shakespearetech.com\/content\/QmVWT6rFRkas3rGvF5MxJhnAqPeb1YPkwk3brLiM1VtZdV\/1000x1000.jpg","Followers":10956,"Total Audio Spent":437,"Unique Supporters":31},{"Artist Name":"RL Grime","Profile Image":"https:\/\/audius-content-8.figment.io\/content\/01H44HF4DPDPP9XYEC1BRMCMDP\/1000x1000.jpg","Followers":27210,"Total Audio Spent":433,"Unique Supporters":27},{"Artist Name":"wuki","Profile Image":"https:\/\/cn1.stuffisup.com\/content\/QmTivyd9DmfwpfuWSSKH2HyPpywKgHrc8wBywK7G4GuSzt\/1000x1000.jpg","Followers":39743,"Total Audio Spent":422,"Unique Supporters":59},{"Artist Name":"PREXSE","Profile Image":"https:\/\/blockdaemon-audius-content-07.bdnodes.net\/content\/01JKWG7D00XHVRWPRW1FW0875R\/1000x1000.jpg","Followers":565,"Total Audio Spent":421,"Unique Supporters":28},{"Artist Name":"dillonfrancis","Profile Image":"https:\/\/audius-content-2.cultur3stake.com\/content\/QmWEBSm1xSjVU3ME8Ak7uY8o7JXLjLh1wVgtftmagWRsrd\/1000x1000.jpg","Followers":149142,"Total Audio Spent":383,"Unique Supporters":18},{"Artist Name":"Lookas\ud83d\udc68\u200d\ud83d\ude80","Profile Image":"https:\/\/creatornode.audius.prod-eks-ap-northeast-1.staked.cloud\/content\/QmTAbED1iRugvvwQYVroJG5e8u2emRho6j2jidtghLjFfC\/1000x1000.jpg","Followers":9744,"Total Audio Spent":378,"Unique Supporters":17},{"Artist Name":"RickyRombo","Profile Image":"https:\/\/audius-creator-1.theblueprint.xyz\/content\/QmaDCVoQDGQHUAdCFY9qrE2RhyJYoePqGvg4Eh9d5muuWF\/1000x1000.jpg","Followers":388,"Total Audio Spent":361,"Unique Supporters":18},{"Artist Name":"JACKNIFE","Profile Image":"https:\/\/blockdaemon-audius-content-04.bdnodes.net\/content\/01H6M9T2D2BE5BY4DW6TT5RMC2\/1000x1000.jpg","Followers":2741,"Total Audio Spent":300,"Unique Supporters":6},{"Artist Name":"Unlike Pluto","Profile Image":"https:\/\/audius-creator-6.theblueprint.xyz\/content\/QmcxM9CXb3BJxLKbUxVKPjzsAtG3xwPPDPy3nxSupBreVc\/1000x1000.jpg","Followers":11255,"Total Audio Spent":297,"Unique Supporters":31},{"Artist Name":"SAMMY & LESEN","Profile Image":"https:\/\/audius-creator-13.theblueprint.xyz\/content\/01JC4KX360MQQ6WE7H4GY62SA4\/1000x1000.jpg","Followers":8476,"Total Audio Spent":283,"Unique Supporters":11},{"Artist Name":"EIME","Profile Image":"https:\/\/creatornode.audius1.prod-eks-ap-northeast-1.staked.cloud\/content\/Qmf9JbnkGLMSz6Ym4PXnT91Xs9DxztWHYWQi1wWo98FVS9\/1000x1000.jpg","Followers":3801,"Total Audio Spent":281,"Unique Supporters":44},{"Artist Name":"Zedd","Profile Image":"https:\/\/audius-cn1.tikilabs.com\/content\/Qmc29kZJ9hsKTaMwDzjWupkh8ALTDdr6T58bBwHd7zcz2b\/1000x1000.jpg","Followers":510776,"Total Audio Spent":277,"Unique Supporters":30},{"Artist Name":"Coop Records","Profile Image":"https:\/\/audius-content-11.cultur3stake.com\/content\/01H58FHE6N8QVFDYVCPP834WRB\/1000x1000.jpg","Followers":27810,"Total Audio Spent":264,"Unique Supporters":32},{"Artist Name":"Rome in Silver","Profile Image":"https:\/\/audius-content-2.cultur3stake.com\/content\/Qmf99UAsCmyUwn3BE3aZXZuLsJBDP9z5qVtAvjMKFXrrYn\/1000x1000.jpg","Followers":7521,"Total Audio Spent":252,"Unique Supporters":18},{"Artist Name":"Headroom Records","Profile Image":"https:\/\/audius-content-18.cultur3stake.com\/content\/QmSefSutRHnjDbVEdrLFp5hJBSxL1etfn9JSRaBRjAAW5M\/1000x1000.jpg","Followers":11620,"Total Audio Spent":228,"Unique Supporters":17},{"Artist Name":"Broz Rodr\u00edguez","Profile Image":"https:\/\/audius-content-7.figment.io\/content\/01H41SDTMSXKHPWCVCNMV58XYJ\/1000x1000.jpg","Followers":33973,"Total Audio Spent":226,"Unique Supporters":50},{"Artist Name":"Juginz","Profile Image":"https:\/\/audius-content-14.cultur3stake.com\/content\/QmU97wnKYVmhhb3k7wdex3ZZKM7i4AaN3NNTd87tJZyhHr\/1000x1000.jpg","Followers":285,"Total Audio Spent":226,"Unique Supporters":3},{"Artist Name":"Aluna","Profile Image":"https:\/\/audius-content-11.cultur3stake.com\/content\/QmNXZJpSM7SVrttufkM6VocT6WGDEjJfbQxnSXbGs3kmCJ\/1000x1000.jpg","Followers":271384,"Total Audio Spent":225,"Unique Supporters":22},{"Artist Name":"Galazy","Profile Image":"https:\/\/audius-content-6.figment.io\/content\/QmccQ61bQ7y5Lr1zpTzeJhJGwBah1mpcgzNUjcgHm7A3WP\/1000x1000.jpg","Followers":2242,"Total Audio Spent":184,"Unique Supporters":14},{"Artist Name":"San Holo","Profile Image":"https:\/\/audius-creator-2.theblueprint.xyz\/content\/01JC09XBPJS9FWGG2K31XJYF18\/1000x1000.jpg","Followers":2207,"Total Audio Spent":183,"Unique Supporters":7},{"Artist Name":"Elment","Profile Image":"https:\/\/audius-content-10.cultur3stake.com\/content\/QmXniY8AfgSSK2kkbjV6Hg4S21vpGT7F9cPCxoX1bw8uCy\/1000x1000.jpg","Followers":1072,"Total Audio Spent":182,"Unique Supporters":17},{"Artist Name":"capshun","Profile Image":"https:\/\/cn1.mainnet.audiusindex.org\/content\/QmNPVfKNNWC4Hnyaif69oXSBnNmn7xB7Z8JdpvkbdMdBJD\/1000x1000.jpg","Followers":20024,"Total Audio Spent":182,"Unique Supporters":18},{"Artist Name":"MR\u2022CAR\/\\\\ACK","Profile Image":"https:\/\/creatornode.audius1.prod-eks-ap-northeast-1.staked.cloud\/content\/Qmbcqb1HvwstWmUsd4XUpjvgLRFgo2LkdDgqQowZHGqSTo\/1000x1000.jpg","Followers":58788,"Total Audio Spent":169,"Unique Supporters":28},{"Artist Name":"Slow Magic","Profile Image":"https:\/\/blockdaemon-audius-content-03.bdnodes.net\/content\/01HXHW604DTD0APYZM36GVMSZ0\/1000x1000.jpg","Followers":29839,"Total Audio Spent":161,"Unique Supporters":4},{"Artist Name":"Vincent","Profile Image":"https:\/\/blockchange-audius-content-02.bdnodes.net\/content\/01JKYNR3NVKFT391P614H0Z84A\/1000x1000.jpg","Followers":3348,"Total Audio Spent":152,"Unique Supporters":19},{"Artist Name":"Daktyl","Profile Image":"https:\/\/audius-content-15.cultur3stake.com\/content\/QmXe2a2E6rnGtCt76vmVSWe9FmXFMHVG6CDWiEiMCCTGms\/1000x1000.jpg","Followers":5078,"Total Audio Spent":146,"Unique Supporters":6},{"Artist Name":"KtN","Profile Image":"https:\/\/audius-creator-10.theblueprint.xyz\/content\/QmcbFtRn9LAf2EDqWvwpjanCUJxU8xxi26wKBmpFfjHPrP\/1000x1000.jpg","Followers":47132,"Total Audio Spent":126,"Unique Supporters":13},{"Artist Name":"notminimal.","Profile Image":"https:\/\/blockdaemon-audius-content-08.bdnodes.net\/content\/01J1FSV2DBWNG6S585PQXW0M24\/1000x1000.jpg","Followers":832,"Total Audio Spent":125,"Unique Supporters":12},{"Artist Name":"Chakra Records","Profile Image":"https:\/\/creatornode.audius8.prod-eks-ap-northeast-1.staked.cloud\/content\/01HX05F08JHYHTN5CSWJBN4272\/1000x1000.jpg","Followers":1393,"Total Audio Spent":113,"Unique Supporters":17},{"Artist Name":"Brownies & Lemonade","Profile Image":"https:\/\/cn1.stuffisup.com\/content\/QmU9L4beAM96MpiNqqVTZdiDiCRTeBku1AJCh3NXrE5PxV\/1000x1000.jpg","Followers":34854,"Total Audio Spent":101,"Unique Supporters":11},{"Artist Name":"illexotic","Profile Image":"https:\/\/cn1.stuffisup.com\/content\/QmbYUsrjBJGzTMNtfa2Pod1F8m9aLSkP1LT2Dpi9i4c5vP\/1000x1000.jpg","Followers":3185,"Total Audio Spent":101,"Unique Supporters":9},{"Artist Name":"Lido ","Profile Image":"https:\/\/audius-content-2.figment.io\/content\/QmQAab2S9Wh6WLrGmm6RxDJkdhYw1gbeHfYSFZvLnsE7wj\/1000x1000.jpg","Followers":58342,"Total Audio Spent":96,"Unique Supporters":18},{"Artist Name":"3LAU","Profile Image":"https:\/\/audius-content-18.cultur3stake.com\/content\/QmZRthg95LV1rm3VzLhohv6NU329geBMGgybtrNKPxQYRG\/1000x1000.jpg","Followers":24093,"Total Audio Spent":93,"Unique Supporters":19},{"Artist Name":"brokenkites","Profile Image":"https:\/\/blockdaemon-audius-content-09.bdnodes.net\/content\/QmRgovJwPc9TKiHXepEVkMFLASRq38hdNi3Q3NKgndEomo\/1000x1000.jpg","Followers":1861,"Total Audio Spent":84,"Unique Supporters":10},{"Artist Name":"Steve Aoki","Profile Image":"https:\/\/blockdaemon-audius-content-02.bdnodes.net\/content\/QmP4o9oBmH9L7hwNBzsbZXxwtvLK9bHLqr6fc9eVeGAbwx\/1000x1000.jpg","Followers":9714,"Total Audio Spent":82,"Unique Supporters":8},{"Artist Name":"BADMOUTH RECS","Profile Image":"https:\/\/audius-creator-7.theblueprint.xyz\/content\/QmbbFxexaU9sua36TovqNRXGrKXNbhuPUJEKeSCYDjzLeQ\/1000x1000.jpg","Followers":2725,"Total Audio Spent":76,"Unique Supporters":8}];
+
+    const svg = d3.select("svg"),
+          width = +svg.attr("width"),
+          height = +svg.attr("height"),
+          margin = {top: 40, right: 40, bottom: 60, left: 60},
+          innerWidth = width - margin.left - margin.right,
+          innerHeight = height - margin.top - margin.bottom;
+
+    const xSlider = document.getElementById("xSlider");
+    const ySlider = document.getElementById("ySlider");
+
+    const tooltip = d3.select(".tooltip");
+    const g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    let x = d3.scaleLinear().range([0, innerWidth]);
+    let y = d3.scaleLinear().range([innerHeight, 0]);
+
+    const xAxisG = g.append("g").attr("transform", "translate(0," + innerHeight + ")");
+    const yAxisG = g.append("g");
+
+    xAxisG.append("text")
+        .attr("x", innerWidth / 2)
+        .attr("y", 40)
+        .attr("fill", "#000")
+        .attr("text-anchor", "middle")
+        .text("Unique Supporters");
+
+    yAxisG.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -innerHeight / 2)
+        .attr("y", -40)
+        .attr("fill", "#000")
+        .attr("text-anchor", "middle")
+        .text("Total $AUDIO Received");
+
+    const images = g.selectAll("image").data(data).enter().append("image")
+        .attr("xlink:href", d => d["Profile Image"])
+        .attr("width", 32)
+        .attr("height", 32)
+        .attr("clip-path", "circle(16px at center)")
+        .on("mouseover", function(event, d) {
+            tooltip.transition().duration(200).style("opacity", .9);
+            tooltip.html("<strong>" + d["Artist Name"] + "</strong><br/>Supporters: " + d["Unique Supporters"] + "<br/>$AUDIO: " + d["Total Audio Spent"] + "<br/>Followers: " + d["Followers"])
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseout", function() {
+            tooltip.transition().duration(500).style("opacity", 0);
+        });
+
+    const labels = g.selectAll("text.label")
+        .data(data)
+        .enter().append("text")
+        .attr("class", "label")
+        .text(d => d["Artist Name"])
+        .attr("font-size", "10px")
+        .attr("text-anchor", "middle");
+
+    function updateChart() {
+        const maxX = +xSlider.value;
+        const maxY = +ySlider.value;
+
+        x.domain([0, maxX]);
+        y.domain([0, maxY]);
+
+        xAxisG.call(d3.axisBottom(x));
+        yAxisG.call(d3.axisLeft(y));
+
+        images
+            .attr("x", d => x(d["Unique Supporters"]) - 16)
+            .attr("y", d => y(d["Total Audio Spent"]) - 16);
+
+        const labelNodes = data.map(d => ({
+            x: x(d["Unique Supporters"]),
+            y: y(d["Total Audio Spent"]) - 18, // float label above the image
+            artist: d["Artist Name"]
+        }));
+
+        const sim = d3.forceSimulation(labelNodes)
+            .force("collide", d3.forceCollide(14))
+            .stop();
+
+        for (let i = 0; i < 120; i++) sim.tick();
+
+        labels
+            .data(labelNodes)
+            .attr("x", d => d.x)
+            .attr("y", d => d.y)
+            .attr("dy", "0") // center vertically relative to the label position
+    }
+
+    xSlider.addEventListener("input", updateChart);
+    ySlider.addEventListener("input", updateChart);
+
+    updateChart();
+</script>
+</body>
+</html>
